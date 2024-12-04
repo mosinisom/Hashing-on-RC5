@@ -165,22 +165,27 @@ namespace Backend.Services
 
       KeyExpansion(keyBytes);
 
-      byte[] H_prev = new byte[8];
+      byte[] H_prev = new byte[24];
 
       byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-      int blockCount = (messageBytes.Length + 7) / 8;
+      int blockCount = (messageBytes.Length + 23) / 24;
 
       for (int i = 0; i < blockCount; i++)
       {
-        byte[] M_i = new byte[8];
-        int bytesToCopy = Math.Min(8, messageBytes.Length - i * 8);
-        Array.Copy(messageBytes, i * 8, M_i, 0, bytesToCopy);
+        byte[] M_i = new byte[24];
+        int bytesToCopy = Math.Min(24, messageBytes.Length - i * 24);
+        Array.Copy(messageBytes, i * 24, M_i, 0, bytesToCopy);
 
-        string encryptedHPrev = Encrypt(Convert.ToBase64String(H_prev), key);
+        for (int j = 0; j < 24; j++)
+        {
+          H_prev[j] ^= M_i[j];
+        }
+
+        string encryptedHPrev = Encrypt(Convert.ToBase64String(H_prev), Convert.ToBase64String(keyBytes));
         byte[] E_H_prev = Convert.FromBase64String(encryptedHPrev);
 
-        byte[] H_i = new byte[8];
-        for (int j = 0; j < 8; j++)
+        byte[] H_i = new byte[24];
+        for (int j = 0; j < 24; j++)
         {
           H_i[j] = (byte)(E_H_prev[j] ^ M_i[j] ^ H_prev[j]);
         }
@@ -188,7 +193,7 @@ namespace Backend.Services
         H_prev = H_i;
       }
 
-      return Convert.ToBase64String(H_prev);
+      return Convert.ToBase64String(H_prev).Substring(0, 32);
     }
 
   }

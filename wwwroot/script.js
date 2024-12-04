@@ -13,12 +13,7 @@ function initializeWebSocket() {
 
   socket.onmessage = function (event) {
     let response = JSON.parse(event.data);
-    if (response.action === "generateKey") {
-      document.getElementById("key").value = response.response;
-    } 
-    else {
-      document.getElementById("output").textContent = response.response;
-    }
+    document.getElementById("output").textContent = response.response;
   };
 
   socket.onclose = function () {
@@ -40,26 +35,11 @@ function sendMessage(message) {
   }
 }
 
-function encrypt() {
+function hash() {
   let text = document.getElementById("inputText").value;
-  let key = document.getElementById("key").value;
-  if (key === "") {
-    generateKey();
-  }
 
-  let message = { action: "encrypt", text: text, key: key };
-  sendMessage(message);
-}
-
-function decrypt() {
-  let text = document.getElementById("inputText").value;
-  let key = document.getElementById("key").value;
-  let message = { action: "decrypt", text: text, key: key };
+  let message = { action: "hash", text: text};
   sendMessage(message);
 }
 
 
-function generateKey() {
-  let message = { action: "generateKey" };
-  sendMessage(message);
-}

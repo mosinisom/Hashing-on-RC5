@@ -37,11 +37,11 @@ namespace Backend.Handlers
       Console.WriteLine($"Received message: {receivedMessage}");
       var request = JsonSerializer.Deserialize<RequestMessage>(receivedMessage);
 
+      Console.WriteLine($"Action: {request.Action}, Text: {request.Text}"); 
+
       string responseText = request.Action switch
       {
-        "generateKey" => _cipherService.GenerateKey(),
-        "encrypt" => _cipherService.Encrypt(request.Text, request.Key),
-        "decrypt" => _cipherService.Decrypt(request.Text, request.Key),
+        "hash" => _cipherService.Hash(request.Text),
         _ => throw new InvalidOperationException("Unknown action")
       };
 

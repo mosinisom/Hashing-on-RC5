@@ -53,6 +53,11 @@ namespace Backend.Services
     public string Encrypt(string text, string key)
     {
       byte[] keyBytes = Convert.FromBase64String(key);
+
+      B = keyBytes.Length;
+      C = B / 4;
+      if (B % 4 != 0) C++;
+
       KeyExpansion(keyBytes);
 
       byte[] textBytes = Encoding.UTF8.GetBytes(text);
@@ -181,7 +186,7 @@ namespace Backend.Services
           H_prev[j] ^= M_i[j];
         }
 
-        string encryptedHPrev = Encrypt(Convert.ToBase64String(H_prev), Convert.ToBase64String(keyBytes));
+        string encryptedHPrev = Encrypt(Convert.ToBase64String(H_prev), Convert.ToBase64String(M_i));
         byte[] E_H_prev = Convert.FromBase64String(encryptedHPrev);
 
         byte[] H_i = new byte[24];
